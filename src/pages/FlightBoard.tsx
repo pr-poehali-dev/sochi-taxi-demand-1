@@ -3,6 +3,7 @@ import Icon from "@/components/ui/icon";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { fetchAirportData, type Flight, type AirportData } from "@/lib/api";
+import AirportQueueWidget from "@/components/AirportQueueWidget";
 
 const statusConfig: Record<string, { label: string; color: string; bg: string }> = {
   on_time:   { label: "По расписанию", color: "text-green-400",  bg: "bg-green-500/10 border-green-500/25" },
@@ -237,6 +238,11 @@ export default function FlightBoard() {
           </button>
         </div>
       )}
+
+      {/* Airport queue — full widget */}
+      <div className="shrink-0">
+        <AirportQueueWidget />
+      </div>
     </div>
   );
 }

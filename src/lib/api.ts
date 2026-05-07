@@ -43,11 +43,41 @@ export interface Tariff {
   color: string;
 }
 
+export interface QueueTariff {
+  tariff_id: string;
+  tariff_name: string;
+  color: string;
+  cars_in_queue: number;
+  wait_order_min: number;
+  queue_status: "overloaded" | "normal" | "low" | "critical";
+  status_label: string;
+}
+
+export interface NextFlight {
+  flight: string;
+  airline: string;
+  arrives_in_min: number;
+  passengers: number;
+  terminal: string;
+  actual: string;
+}
+
+export interface AirportQueue {
+  total_cars: number;
+  by_tariff: QueueTariff[];
+  next_flight: NextFlight | null;
+  upcoming_pax: number;
+  demand_level: "low" | "medium" | "high";
+  updated_at: string;
+  location: string;
+}
+
 export interface AirportData {
   arrivals: Flight[];
   departures: Flight[];
   demand_zones: DemandZone[];
   tariffs: Tariff[];
+  airport_queue: AirportQueue;
   updated_at: string;
   airport: string;
   city: string;
