@@ -1,7 +1,6 @@
 import { useState } from "react";
 import Icon from "@/components/ui/icon";
 import { Switch } from "@/components/ui/switch";
-import { Badge } from "@/components/ui/badge";
 
 type NotifType = "demand" | "forecast" | "flight" | "system";
 type FilterType = "all" | NotifType;

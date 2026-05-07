@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Icon from "@/components/ui/icon";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 const periods = ["Сегодня", "Неделя", "Месяц", "Квартал"] as const;
 type Period = typeof periods[number];
@@ -57,14 +57,6 @@ const data: Record<Period, {
     ],
   },
 };
-
-const zones_stats = [
-  { name: "Аэропорт",      share: 38, coeff: "3.8" },
-  { name: "Центральный",   share: 23, coeff: "2.4" },
-  { name: "Адлер",         share: 17, coeff: "2.0" },
-  { name: "Красная Поляна",share: 13, coeff: "1.8" },
-  { name: "Хоста",         share: 9,  coeff: "1.2" },
-];
 
 const recommendations = [
   { icon: "Clock",   title: "Лучшие часы", desc: "17:00–19:00 и 08:00–10:00 — наибольший доход на час" },

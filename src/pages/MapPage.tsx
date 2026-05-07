@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import Icon from "@/components/ui/icon";
-import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import { fetchAirportData, type DemandZone, type AirportData } from "@/lib/api";
 import AirportQueueWidget from "@/components/AirportQueueWidget";
