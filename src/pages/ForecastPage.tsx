@@ -35,7 +35,6 @@ export default function ForecastPage() {
   }, []);
 
   const zones = data?.demand_zones ?? [];
-  const maxSurge = zones.length ? Math.max(...zones.map(z => z.surge)) : 5;
 
   // Generate 6-hour demand chart from zones
   const chartData = hours.map((h, i) => {
