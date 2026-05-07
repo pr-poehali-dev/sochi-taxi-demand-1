@@ -43,7 +43,7 @@ export default function ProfilePage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [smsPhone, setSmsPhone] = useState("+7 (918) 452-87-31");
   const [tariffs, setTariffs] = useState<Tariff[]>([]);
-  const [selectedTariffs, setSelectedTariffs] = useState<string[]>(getDriverTariffs);
+  const [selectedTariffs, setSelectedTariffs] = useState<string[]>(() => getDriverTariffs());
 
   useEffect(() => {
     fetchAirportData().then(d => setTariffs(d.tariffs)).catch(() => {});
