@@ -4,7 +4,7 @@ import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { fetchAirportData, type Tariff } from "@/lib/api";
-import { DRIVER_TARIFF_KEY } from "@/hooks/use-tariff-alerts";
+import { getDriverTariffs, setDriverTariffs } from "@/hooks/use-tariff-alerts";
 
 const driverData = {
   name: "Алексей Соколов",
@@ -43,18 +43,23 @@ export default function ProfilePage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [smsPhone, setSmsPhone] = useState("+7 (918) 452-87-31");
   const [tariffs, setTariffs] = useState<Tariff[]>([]);
-  const [selectedTariff, setSelectedTariff] = useState<string | null>(
-    localStorage.getItem(DRIVER_TARIFF_KEY)
-  );
+  const [selectedTariffs, setSelectedTariffs] = useState<string[]>(getDriverTariffs);
 
   useEffect(() => {
     fetchAirportData().then(d => setTariffs(d.tariffs)).catch(() => {});
   }, []);
 
-  const handleSelectTariff = (id: string | null) => {
-    setSelectedTariff(id);
-    if (id) localStorage.setItem(DRIVER_TARIFF_KEY, id);
-    else localStorage.removeItem(DRIVER_TARIFF_KEY);
+  const handleToggleTariff = (id: string) => {
+    setSelectedTariffs(prev => {
+      const next = prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id];
+      setDriverTariffs(next);
+      return next;
+    });
+  };
+
+  const handleClearTariffs = () => {
+    setSelectedTariffs([]);
+    setDriverTariffs([]);
   };
 
   const toggle = (id: string) => {
@@ -182,43 +187,49 @@ export default function ProfilePage() {
 
       {/* Tariff profile */}
       <div className="surface-1 rounded-lg border border-subtle p-4">
-        <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1 font-medium flex items-center gap-1.5">
-          <Icon name="Tag" fallback="Circle" size={11} /> Мой тариф
+        <div className="flex items-center justify-between mb-1">
+          <div className="text-xs text-muted-foreground uppercase tracking-wider font-medium flex items-center gap-1.5">
+            <Icon name="Tag" fallback="Circle" size={11} /> Мои тарифы
+          </div>
+          {selectedTariffs.length > 0 && (
+            <button onClick={handleClearTariffs} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+              Сбросить
+            </button>
+          )}
         </div>
         <p className="text-xs text-muted-foreground mb-3">
-          Выберите тариф, на котором вы работаете — push-уведомление «Пора ехать» придёт только по нему.
+          Выберите тарифы, на которых работаете — можно несколько. Push-сигнал «Пора ехать» придёт только по ним.
         </p>
         <div className="flex flex-wrap gap-2">
-          <button
-            onClick={() => handleSelectTariff(null)}
-            className={`flex items-center gap-1.5 text-sm px-3 py-2 rounded border transition-all ${!selectedTariff ? "bg-blue-600 text-white border-blue-600" : "border-subtle text-muted-foreground hover:text-foreground"}`}
-          >
-            Все тарифы
-          </button>
-          {tariffs.map(t => (
-            <button
-              key={t.id}
-              onClick={() => handleSelectTariff(t.id)}
-              className={`flex items-center gap-2 text-sm px-3 py-2 rounded border transition-all ${selectedTariff === t.id ? "border-opacity-80 text-white" : "border-subtle text-muted-foreground hover:text-foreground"}`}
-              style={selectedTariff === t.id ? { background: t.color, borderColor: t.color } : {}}
-            >
-              <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: t.color }} />
-              {t.name}
-            </button>
-          ))}
+          {tariffs.map(t => {
+            const active = selectedTariffs.includes(t.id);
+            return (
+              <button
+                key={t.id}
+                onClick={() => handleToggleTariff(t.id)}
+                className={`flex items-center gap-2 text-sm px-3 py-2 rounded border transition-all ${active ? "text-white" : "border-subtle text-muted-foreground hover:text-foreground"}`}
+                style={active ? { background: t.color, borderColor: t.color } : {}}
+              >
+                <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: active ? "rgba(255,255,255,0.8)" : t.color }} />
+                {t.name}
+                {active && <Icon name="Check" fallback="Circle" size={12} className="text-white/80" />}
+              </button>
+            );
+          })}
         </div>
-        {selectedTariff && tariffs.length > 0 && (
-          <div className="mt-3 flex items-center gap-2 text-xs text-green-400">
-            <Icon name="BellRing" fallback="Circle" size={12} />
-            Уведомления настроены на тариф «{tariffs.find(t => t.id === selectedTariff)?.name}»
-          </div>
-        )}
-        {!selectedTariff && (
-          <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
-            <Icon name="Bell" fallback="Circle" size={12} />
-            Уведомления придут по всем тарифам
-          </div>
-        )}
+        <div className="mt-3 flex items-center gap-2 text-xs">
+          {selectedTariffs.length > 0 ? (
+            <span className="text-green-400 flex items-center gap-1.5">
+              <Icon name="BellRing" fallback="Circle" size={12} />
+              Уведомления по {selectedTariffs.length === 1 ? `тарифу «${tariffs.find(t => t.id === selectedTariffs[0])?.name}»` : `${selectedTariffs.length} тарифам`}
+            </span>
+          ) : (
+            <span className="text-muted-foreground flex items-center gap-1.5">
+              <Icon name="Bell" fallback="Circle" size={12} />
+              Уведомления придут по всем тарифам
+            </span>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

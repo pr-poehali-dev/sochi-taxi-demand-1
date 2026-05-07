@@ -2,10 +2,18 @@ import { useEffect, useRef, useCallback } from "react";
 import { toast } from "@/hooks/use-toast";
 import type { QueueTariff } from "@/lib/api";
 
-const DRIVER_TARIFF_KEY = "driver_tariff_id";
+export const DRIVER_TARIFF_KEY = "driver_tariff_ids";
 
-function getDriverTariff(): string | null {
-  return localStorage.getItem(DRIVER_TARIFF_KEY);
+export function getDriverTariffs(): string[] {
+  try {
+    return JSON.parse(localStorage.getItem(DRIVER_TARIFF_KEY) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+export function setDriverTariffs(ids: string[]) {
+  localStorage.setItem(DRIVER_TARIFF_KEY, JSON.stringify(ids));
 }
 
 async function requestPushPermission(): Promise<boolean> {
@@ -16,7 +24,7 @@ async function requestPushPermission(): Promise<boolean> {
   return result === "granted";
 }
 
-function sendBrowserPush(title: string, body: string, color: string) {
+function sendBrowserPush(title: string, body: string) {
   if (!("Notification" in window) || Notification.permission !== "granted") return;
   try {
     new Notification(title, {
@@ -27,7 +35,7 @@ function sendBrowserPush(title: string, body: string, color: string) {
       requireInteraction: true,
     });
   } catch {
-    /* ignore if notifications not supported */
+    /* ignore */
   }
 }
 
@@ -44,7 +52,7 @@ export function useTariffAlerts(tariffs: QueueTariff[] | undefined) {
   useEffect(() => {
     if (!tariffs || tariffs.length === 0) return;
 
-    const driverTariff = getDriverTariff();
+    const driverTariffs = getDriverTariffs();
 
     tariffs.forEach((t) => {
       const prevStatus = prevStatusRef.current[t.tariff_id];
@@ -55,25 +63,20 @@ export function useTariffAlerts(tariffs: QueueTariff[] | undefined) {
         return;
       }
 
-      const isDriver = !driverTariff || driverTariff === t.tariff_id;
+      const isDriver =
+        driverTariffs.length === 0 || driverTariffs.includes(t.tariff_id);
       const wasOverloaded = prevStatus === "overloaded";
       const isNowDeficit = currStatus === "low" || currStatus === "critical";
 
       if (wasOverloaded && isNowDeficit && isDriver) {
-        const urgency = currStatus === "critical" ? "срочно" : "хорошее время";
         const title = `🚗 Едем! Тариф «${t.tariff_name}»`;
         const body =
           currStatus === "critical"
             ? `Заказы поступают быстро — очередь минимальная. Ждать ~${t.wait_order_min} мин.`
             : `Очередь спала — мало машин. Время ехать! Ждать ~${t.wait_order_min} мин.`;
 
-        sendBrowserPush(title, body, t.color);
-
-        toast({
-          title,
-          description: body,
-          duration: 8000,
-        });
+        sendBrowserPush(title, body);
+        toast({ title, description: body, duration: 8000 });
       }
 
       prevStatusRef.current[t.tariff_id] = currStatus;
@@ -82,5 +85,3 @@ export function useTariffAlerts(tariffs: QueueTariff[] | undefined) {
 
   return { requestPermission };
 }
-
-export { getDriverTariff, DRIVER_TARIFF_KEY };
