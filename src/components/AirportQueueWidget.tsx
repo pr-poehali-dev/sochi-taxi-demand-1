@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import Icon from "@/components/ui/icon";
 import { fetchAirportData, type AirportQueue, type QueueTariff } from "@/lib/api";
+import { useTariffAlerts } from "@/hooks/use-tariff-alerts";
 
 const statusColors: Record<string, { dot: string; text: string; bg: string; border: string }> = {
   overloaded: { dot: "bg-red-500",    text: "text-red-400",    bg: "bg-red-500/8",    border: "border-red-500/20"   },
@@ -67,6 +68,18 @@ export default function AirportQueueWidget({ compact = false }: Props) {
   const [loading, setLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState("");
   const [tick, setTick] = useState(0);  // для таймера до следующего рейса
+  const [pushEnabled, setPushEnabled] = useState(
+    typeof Notification !== "undefined" && Notification.permission === "granted"
+  );
+
+  const { requestPermission } = useTariffAlerts(queue?.by_tariff);
+
+  const handleEnablePush = async () => {
+    await requestPermission();
+    setPushEnabled(
+      typeof Notification !== "undefined" && Notification.permission === "granted"
+    );
+  };
 
   const load = useCallback(async () => {
     try {
@@ -183,6 +196,21 @@ export default function AirportQueueWidget({ compact = false }: Props) {
             <div className={`w-1.5 h-1.5 rounded-full ${queue.demand_level === "high" ? "bg-red-500" : queue.demand_level === "medium" ? "bg-amber-500" : "bg-green-500"} animate-pulse`} />
             {queue.demand_level === "high" ? "Высокий спрос" : queue.demand_level === "medium" ? "Средний спрос" : "Низкий спрос"}
           </div>
+          {!pushEnabled && (
+            <button
+              onClick={handleEnablePush}
+              className="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded border border-amber-500/30 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 transition-colors"
+            >
+              <Icon name="Bell" fallback="Circle" size={11} />
+              Включить уведомления
+            </button>
+          )}
+          {pushEnabled && (
+            <div className="flex items-center gap-1.5 text-xs text-green-400">
+              <Icon name="BellRing" fallback="Circle" size={11} />
+              Уведомления включены
+            </div>
+          )}
           <button onClick={load} className="p-1.5 rounded surface-2 border border-subtle hover:border-blue-500/30 transition-colors">
             <Icon name="RefreshCw" fallback="Circle" size={12} className="text-muted-foreground" />
           </button>

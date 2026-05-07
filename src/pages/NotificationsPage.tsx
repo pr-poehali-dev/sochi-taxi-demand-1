@@ -19,6 +19,7 @@ interface Notif {
 }
 
 const notifications: Notif[] = [
+  { id: 0, type: "demand",   channel: "push", title: "🚗 Едем! Тариф «Комфорт»",     body: "Очередь спала — мало машин. Время ехать! Ждать ~3 мин заказ.",    time: "2 мин назад",   read: false, priority: "critical", link: "map" },
   { id: 1, type: "demand",   channel: "push", title: "Высокий спрос: Аэропорт",      body: "Коэфф. ×5.1 · Рейс SU1814 прибывает в 18:50 · 219 пасс.",       time: "5 мин назад",   read: false, priority: "critical", link: "map" },
   { id: 2, type: "demand",   channel: "sms",  title: "Срочно: Центральный район",    body: "142 активных заказа. Тарифы: Бизнес ×4.8, Комфорт+ ×3.5",          time: "12 мин назад",  read: false, priority: "critical", link: "map" },
   { id: 3, type: "forecast", channel: "push", title: "Прогноз: пиковый час",         body: "Через 45 мин пик у аэропорта. Рейс SU1814, 219 чел.",              time: "20 мин назад",  read: true,  priority: "high",     link: "forecast" },
@@ -46,12 +47,13 @@ const priorityCfg = {
 const zones = ["Все зоны", "Аэропорт", "Центральный", "Адлер", "Красная Поляна"];
 
 const notifSettings = [
-  { id: "demand_high",  label: "Высокий спрос (≥×3)",      push: true,  sms: false },
-  { id: "demand_crit",  label: "Критический спрос (≥×4.5)", push: true,  sms: true  },
-  { id: "forecast",     label: "Прогнозы за 45 мин",        push: true,  sms: false },
-  { id: "flight_delay", label: "Задержки рейсов",           push: true,  sms: false },
-  { id: "flight_arr",   label: "Прилёты (крупные рейсы)",   push: true,  sms: false },
-  { id: "system",       label: "Системные и итоги дня",     push: false, sms: false },
+  { id: "queue_go",     label: "Сигнал «Пора ехать» (очередь спала)",  push: true,  sms: false },
+  { id: "demand_high",  label: "Высокий спрос (≥×3)",                  push: true,  sms: false },
+  { id: "demand_crit",  label: "Критический спрос (≥×4.5)",            push: true,  sms: true  },
+  { id: "forecast",     label: "Прогнозы за 45 мин",                   push: true,  sms: false },
+  { id: "flight_delay", label: "Задержки рейсов",                      push: true,  sms: false },
+  { id: "flight_arr",   label: "Прилёты (крупные рейсы)",              push: true,  sms: false },
+  { id: "system",       label: "Системные и итоги дня",                push: false, sms: false },
 ];
 
 export default function NotificationsPage() {
