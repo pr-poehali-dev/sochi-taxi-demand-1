@@ -1,0 +1,15 @@
+{
+  "tests": [
+    {
+      "name": "GET flights and demand zones",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "airport": "AER",
+        "city": "Сочи"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}
