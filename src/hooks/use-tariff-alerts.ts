@@ -30,7 +30,6 @@ function sendBrowserPush(title: string, body: string) {
     new Notification(title, {
       body,
       icon: "/favicon.ico",
-      badge: "/favicon.ico",
       tag: "tariff-alert",
       requireInteraction: true,
     });
